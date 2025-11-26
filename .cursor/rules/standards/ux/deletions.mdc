@@ -1,0 +1,19 @@
+---
+description: UX patterns for destructive actions (deletions)
+alwaysApply: false
+---
+
+### Deletion Confirmations
+
+Use confirmation dialogs before deleting significant objects that are difficult or impossible to undo. Confirmation dialogs should:
+
+- Display the item name/title being deleted
+- Clearly state the action cannot be undone
+- Require explicit "Delete" or "Confirm" action
+- Use destructive button styling (e.g., `variant="destructive"`)
+
+**When confirmation is not necessary:**
+
+- Deleting easily recoverable items
+- Operations that can be easily undone
+- Temporary or draft content with minimal user investment

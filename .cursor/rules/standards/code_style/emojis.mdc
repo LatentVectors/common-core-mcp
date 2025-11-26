@@ -1,0 +1,11 @@
+---
+description: Guidelines for the use of emojis.
+alwaysApply: false
+---
+
+# Emoji Usage
+
+- **NEVER use emojis** in code, user-facing messages, comments, or UI elements
+- **ALWAYS use professional icon sets** appropriate to the technology and context (e.g., Material icons `:material/icon_name:` in Streamlit)
+- If no appropriate icon exists in the available icon set, omit the icon rather than using an emoji
+- Keep user-facing messages clear and professional without decorative elements

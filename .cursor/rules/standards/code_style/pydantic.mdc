@@ -1,0 +1,72 @@
+---
+description: Rules for implementing Pydantic models in Python.
+alwaysApply: false
+---
+
+## Type Safety and Data Validation
+
+- **Always use Pydantic models for structured data**: Wrap JSON, dictionaries, or untyped data in Pydantic models. Never pass raw dictionaries or JSON strings when a typed model can be used.
+- **Use the most specific model type**: Use the most specific Pydantic model type in function signatures. Only use union types or `BaseModel` when the function truly handles multiple types. Example: prefer `RoleOverviewUpdate` over `ProposalContent` if only handling role updates.
+- **Single source of truth**: Define Pydantic models once (typically in database layer for persisted data) and import elsewhere. Avoid duplicating model definitions.
+- **Database boundary pattern**: Serialization happens at the database boundary. Database models provide `parse_*`/`serialize_*` methods. Application code works with typed models, not JSON strings or dictionaries.
+
+## Model Definition
+
+- Prefer the simpler syntax for default values in Pydantic models, over the more verbose `Field` notation whenever possible.
+
+```python
+from pydantic import BaseModel
+
+
+class Model(BaseModel):
+    # Use simple syntax for basic, mutable values.
+    # Pydantic creates a deep copy so this is safe.
+    item_counts: list[dict[str, int]] = [{}]
+    # Use simple `= {default}` syntax for basic values too.
+    some_number: int = 42
+```
+
+- Prefer the use of `Annotated` to attach additional metadata to models.
+
+```python
+from typing import Annotated
+
+from pydantic import BaseModel, Field, WithJsonSchema
+
+
+class Model(BaseModel):
+    name: Annotated[str, Field(strict=True), WithJsonSchema({'extra': 'data'})]
+```
+
+- However, note that certain arguments to the Field() function (namely, default, default_factory, and alias) are taken into account by static type checkers to synthesize a correct **init** method. The annotated pattern is not understood by them, so you should use the normal assignment form instead.
+
+- Use a discriminator in scenarios with mixed types where there is a need to differentiate between the types.
+
+```python
+# Example of using a discriminator to identify specific models in a mixed-type situation.
+from typing import Annotated, Literal
+
+from pydantic import BaseModel, Discriminator, Field, Tag
+
+
+class Cat(BaseModel):
+    pet_type: Literal['cat']
+    age: int
+
+
+class Dog(BaseModel):
+    pet_kind: Literal['dog']
+    age: int
+
+
+def pet_discriminator(v):
+    if isinstance(v, dict):
+        return v.get('pet_type', v.get('pet_kind'))
+    return getattr(v, 'pet_type', getattr(v, 'pet_kind', None))
+
+
+class Model(BaseModel):
+    pet: Annotated[Cat, Tag('cat')] | Annotated[Dog, Tag('dog')] = Field(
+        discriminator=Discriminator(pet_discriminator)
+    )
+```

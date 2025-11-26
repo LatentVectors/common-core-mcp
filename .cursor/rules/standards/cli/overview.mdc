@@ -1,0 +1,54 @@
+---
+description: Defines rules for defining CLI functionality.
+alwaysApply: false
+---
+
+# CLI Guidance & Best Practices
+
+- The main entrypoint for using the cli in this project is `cli.py` the sole responsibility of this file is to import the cli app and expose it for execution. NO OTHER CODE SHOULD EXIST IN THIS FILE!
+- The root-level app for defining the main CLI and its sub-commands is `src/cli.py`. This file should import sub-sections of the CLI from other modules as well as provide easy-access, root-level commands for the most common workflows.
+- Sub-modules that expose CLI functionality should do so by defining their own `cli.py` or `cli_{subgroup}.py` file(s).
+- If a single module has multiple natural groupings of CLI commands, rather than creating one, unrelated, complex `cli.py` create multiple `cli_{subgroup}.py` files for better organization and ease of finding related content.
+- Module-specific `cli.py` or `cli_{subgroup}.py` files should export a typer app with a collection of sub-commands. Import and attach these groups of commands to the main cli in `src/cli.py`.
+- Add all imports at the top of typer commands for the CLI, to avoid expensive imports before the CLI starts.
+
+# Example Template
+```python
+# Example root-level src/cli.py
+from __future__ import annotations
+
+import typer
+
+# Import groups of commands from sub-modules exported as typer apps.
+from src.first_mod.cli import first_mod_app
+from src.second_mod.cli import second_mod_app
+
+# Define the root-level app.
+app = typer.Typer()
+
+
+# Attach the sub-commands.
+app.add_typer(first_mod_app, name="first_mod")
+app.add_typer(second_mod_app, name="second_mod")
+
+
+# Add root-level commands.
+@app.command()
+def my_command(
+    flag: bool = typer.Option(False, "--flag", help="Flag for some option."),
+) -> None:
+    """Root level command."""
+    # Print statement to provide rapid feedback to the user, before expensive imports.
+    print("Starting my command.")
+
+    # Import command-level modules inside the command to avoid expensive imports before executing commands.
+    from src.my_mod import my_function_with_expensive_imports
+
+    for i in range(10):
+        my_function_with_expensive_imports(toggle_arg=flag)
+
+
+if __name__ == "__name__":
+    app()
+
+```

@@ -1,0 +1,22 @@
+---
+description: Rules for implementing workflow files with LLM chains and structured outputs.
+alwaysApply: false
+---
+
+# Workflow File Structure
+
+Files containing simple LLM interactions with inline prompts and structured outputs follow a specific structure.
+
+## File Layout Order
+
+1. **Main workflow function(s)** - Primary public function(s)
+2. **Helper functions** - Private utility functions
+3. **Prompt strings** - System and user prompts (`_SYSTEM_PROMPT`, `_USER_PROMPT`)
+4. **Pydantic models** - Structured output schema models
+5. **Model and chain setup** - LLM initialization, structured output config, prompt template, chain
+
+## Key Principles
+
+- Use `from __future__ import annotations` to enable forward references
+- Main function references types/variables defined later via forward references
+- Use clear section dividers to separate logical sections

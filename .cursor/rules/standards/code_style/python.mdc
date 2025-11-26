@@ -1,0 +1,71 @@
+---
+globs: **/*.py
+alwaysApply: false
+---
+
+# General
+
+- This project uses Python 3.12. Follow best practices and coding standards for this version.
+- This project is in a Python virtual environment. Remember to activate the environment in `.venv` before executing commands that rely on Python.
+- This project uses pip and pyproject.toml. All dependencies should be declared in pyproject.toml.
+
+## Type Annotations
+
+- **ALWAYS** include full type annotations for all function parameters and return types
+- **EXCEPTION**: Test functions do not need return type annotations (they can use `-> None` or omit entirely)
+- Use typing standards for Python 3.12+, such as using `list` instead of `List` and `str | None` instead of `Optional[str]`.
+- Use `from __future__ import annotations` at the top of files for forward references
+- Whenever there is an if-else statement for an enum or set of literals where all values need to be handled, use `assert_never` to catch missed values.
+- Always use the new syntax for defining generics rather than using TypeVars and Generic.
+- **Prefer typed models over dictionaries**: When functions accept or return structured data, use Pydantic models instead of `dict` types. See `code_style/pydantic.mdc` for details.
+- **Use the most specific type possible**: Use the most specific type that matches what the function handles. Only use generic types (`dict`, `BaseModel`, union types) when the function truly needs to handle multiple types. Example: prefer `AchievementAdd` over `ProposalContent` if the function only handles achievement additions.
+
+## Docstrings
+
+- Use Google-style docstrings for all public functions and classes
+- Include type information in docstrings for complex parameters
+- Keep docstrings concise but informative
+
+## Code Structure
+
+- **Main function first**: Place the primary/main function(s) at the top of the file. Supporting functions, constants, and setup code go below. This ensures readers see the most important content immediately.
+- Keep functions under 50 lines when possible
+- Use early returns to reduce nesting
+- Prefer list comprehensions over explicit loops for simple transformations
+- Use type guards for complex conditional logic
+
+## String Formatting
+
+- **ALWAYS use f-strings** for string formatting and interpolation
+- **NEVER use percent-style formatting** (`%s`, `%d`, `%f`, etc.)
+- Use f-strings for all string concatenation and formatting needs
+
+## Configuration and Constants
+
+- Define constants at module level
+- Use `typing.Final` for constants that shouldn't be modified
+- Group related constants together
+- Use PydanticSettings for overall settings, including ones read from .env.
+
+## Logging
+
+- Import the logger from `logger_config` via `from src.logger_config import logger`.
+- Use structured logging with appropriate log levels
+- Include context in log messages
+- Use loguru for consistent logging across the project
+- Make sure to use `logger.exception` to log all errors inside of expect blocks.
+- Outside of except blocks use `logger.error(msg, exception=True)` and be sure to include the exception and stack trace.
+
+## Performance Considerations
+
+- Use `pathlib.Path` instead of string paths
+- Prefer `list` comprehensions over `map()` for readability
+- Use `collections.defaultdict` when appropriate
+- Use Pydantic for simple data containers.
+
+## Security
+
+- Never log sensitive information (passwords, API keys, etc.)
+- Use environment variables for configuration
+- Validate all user inputs
+- Use parameterized queries for database operations

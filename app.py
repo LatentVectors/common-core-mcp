@@ -2,11 +2,11 @@
 
 import os
 import json
-from typing import Any
 
 from dotenv import load_dotenv
 import gradio as gr
 from huggingface_hub import InferenceClient
+from loguru import logger
 
 # Load environment variables from .env file
 load_dotenv()
@@ -138,6 +138,7 @@ def find_relevant_standards(
         score (highest first). Each result includes the full standard content, metadata, and
         relevance score. On error, success is false and an error message describes the issue.
     """
+    logger.info(f"Finding relevant standards for activity: {activity}")
     # Handle empty string from dropdown (convert to None)
     if grade == "":
         grade = None
@@ -195,6 +196,7 @@ def get_standard_details(standard_id: str) -> str:
         This function does not raise exceptions. All errors are returned as JSON responses
         with success=false and appropriate error messages.
     """
+    logger.info(f"Getting standard details for standard ID: {standard_id}")
     return get_standard_details_impl(standard_id)
 
 
@@ -281,14 +283,12 @@ def chat_with_standards(message: str, history: list):
 
                 # Execute the function
                 if function_name == "find_relevant_standards":
-                    print(f"Finding relevant standards for activity: {function_args.get('activity', '')}")
                     result = find_relevant_standards_impl(
                         activity=function_args.get("activity", ""),
                         max_results=function_args.get("max_results", 5),
                         grade=function_args.get("grade"),
                     )
                 elif function_name == "get_standard_details":
-                    print(f"Getting standard details for standard ID: {function_args.get('standard_id', '')}")
                     result = get_standard_details_impl(
                         standard_id=function_args.get("standard_id", "")
                     )
@@ -415,5 +415,7 @@ demo = gr.TabbedInterface(
 )
 
 if __name__ == "__main__":
+    logger.info("Starting Common Core MCP server")
     demo.launch(mcp_server=True)
+    logger.info("Common Core MCP server started")
 

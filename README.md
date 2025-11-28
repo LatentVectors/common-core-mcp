@@ -1,6 +1,6 @@
 ---
 title: Common Core MCP
-emoji: 🚀
+emoji: 📚
 colorFrom: blue
 colorTo: red
 sdk: gradio
@@ -144,7 +144,7 @@ _Screenshots showing the Gradio interface, MCP client integration, and example r
 ### Prerequisites
 
 - Python 3.12+
-- Pinecone account with API key
+- Pinecone account with API key ([Get started with Pinecone](https://www.pinecone.io/))
 - Hugging Face account with token (for chat interface)
 - Common Standards Project API key (for downloading standards locally)
 
@@ -153,13 +153,21 @@ _Screenshots showing the Gradio interface, MCP client integration, and example r
 ```bash
 git clone <repository-url>
 cd common_core_mcp
+
+# Create and activate virtual environment
+python3.12 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Copy environment file template
 cp .env.example .env
 ```
 
 Edit `.env` and set:
 
-- `PINECONE_API_KEY`: Your Pinecone API key
+- `PINECONE_API_KEY`: Your Pinecone API key ([Get started with Pinecone](https://www.pinecone.io/))
 - `PINECONE_INDEX_NAME`: Pinecone index name (default: `common-core-standards`)
 - `PINECONE_NAMESPACE`: Pinecone namespace (default: `standards`)
 - `HF_TOKEN`: Hugging Face token for chat interface
@@ -176,6 +184,12 @@ The Gradio interface runs at `http://localhost:7860`. The MCP server endpoint is
 ## Local Setup with Pinecone
 
 Before the MCP server can return any results, you must set up your Pinecone database and load standards into it. This section guides you through the complete workflow using the tools CLI.
+
+> **Note**: Make sure your virtual environment is activated before running CLI commands:
+>
+> ```bash
+> source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+> ```
 
 ### Step 1: Initialize Pinecone Index
 
@@ -368,7 +382,7 @@ Connect from Claude Desktop, Cursor, or other MCP clients.
 
 **MCP Server URL**:
 
-- Hugging Face Space: `https://your-space-name.hf.space/gradio_api/mcp/`
+- Hugging Face Space: `https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/`
 - Local: `http://localhost:7860/gradio_api/mcp/`
 
 **Claude Desktop Configuration**:
@@ -385,7 +399,7 @@ Add:
 {
   "mcpServers": {
     "common-core": {
-      "url": "https://your-space-name.hf.space/gradio_api/mcp/"
+      "url": "https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/"
     }
   }
 }
@@ -399,7 +413,7 @@ Edit your Cursor MCP config and add:
 {
   "mcpServers": {
     "common-core": {
-      "url": "https://your-space-name.hf.space/gradio_api/mcp/"
+      "url": "https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/"
     }
   }
 }
@@ -419,23 +433,20 @@ The deployed Hugging Face Space connects to a pre-existing Pinecone database wit
    - `PINECONE_INDEX_NAME` - Index name with Wyoming standards
    - `PINECONE_NAMESPACE` - Namespace containing the standards
    - `HF_TOKEN` - Hugging Face token for chat interface
-5. The Space builds and deploys. The MCP server is available at `https://your-space-name.hf.space/gradio_api/mcp/`
+5. The Space builds and deploys. The MCP server is available at `https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/`
 
 > **Note**: If you're deploying your own Space with different standards, follow the [Local Setup with Pinecone](#local-setup-with-pinecone) workflow to populate your Pinecone database before deploying.
 
 ## Team Information
 
-Built by [@your-username](https://huggingface.co/your-username)
-
-> [!NOTE]
-> Update with your Hugging Face username or team member usernames if working in a team.
+Built by [@lindowXYZ](https://huggingface.co/lindowXYZ)
 
 ## Architecture
 
 Built with:
 
 - **Gradio 6.0+**: Web interface and MCP server functionality
-- **Pinecone**: Vector database for semantic search
+- **Pinecone**: Vector database for semantic search ([Pinecone](https://www.pinecone.io/))
 - **Hugging Face Inference API**: Chat interface with tool calling (Qwen/Qwen2.5-7B-Instruct via Together AI provider)
 - **Pydantic**: Data validation and settings management
 

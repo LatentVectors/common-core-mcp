@@ -31,8 +31,8 @@ class PineconeRecord(BaseModel):
     subject: str
     normalized_subject: str | None = None
     education_levels: list[str]
-    document_id: str
-    document_valid: str
+    document_id: str | None = None
+    document_valid: str | None = None
     publication_status: str | None = None
     jurisdiction_id: str
     jurisdiction_title: str

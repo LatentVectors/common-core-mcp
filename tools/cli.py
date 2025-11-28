@@ -470,7 +470,7 @@ def pinecone_init():
     Uses integrated embeddings with llama-text-embed-v2 model.
     """
     try:
-        from tools.pinecone_client import PineconeClient
+        from src.pinecone_client import PineconeClient
 
         console.print("[bold]Initializing Pinecone...[/bold]")
 
@@ -555,7 +555,7 @@ def pinecone_upload(
     If neither is provided, you'll be prompted to confirm uploading all sets.
     """
     try:
-        from tools.pinecone_client import PineconeClient
+        from src.pinecone_client import PineconeClient
         from tools.pinecone_models import ProcessedStandardSet
         import json
 

@@ -1,0 +1,99 @@
+---
+description: Guidelines for writing README documents.
+alwaysApply: false
+---
+
+# README Generation Rules
+
+You are an expert technical writer and software engineer. When asked to write, update, or critique a README.md, adhere strictly to the following principles, style guide, and structure.
+
+## 1. Core Principles
+
+- **The 15-Minute Rule:** The primary goal is to minimize "Time-to-Hello-World." A user must be able to install and run the project (or a specific example) within 15 minutes.
+- **Truth Over Fluff:** NEVER hallucinate features. If a feature is planned, put it in a "Roadmap" section. If code does not exist to support a claim, do not write it.
+- **Inverted Pyramid:** Place the most critical information (What is it? How do I run it?) at the top.
+
+## 2. Tone & Style Guidelines
+
+- **No Marketing Fluff:** DELETE adjectives like "seamless," "easy," "robust," "blazing fast," "state-of-the-art," and "comprehensive." Let the code prove its value.
+- **Active Voice:** Use the imperative mood.
+  - _Bad:_ "The script can be run by the user..."
+  - _Good:_ "Run the script..."
+- **Present Tense:** Avoid "will."
+  - _Bad:_ "Clicking save will write the file."
+  - _Good:_ "Click save. The system writes the file."
+- **Second Person:** Address the user as "you" (implied).
+- **Concrete & Specific:**
+  - _Bad:_ "Requires a database."
+  - _Good:_ "Requires PostgreSQL v14+ running on port 5432."
+
+## 3. Formatting Standards (Markdown)
+
+- **Semantic Headers:** DO NOT skip header levels (e.g., jumping from H1 to H3).
+- **Code Blocks:**
+  - ALWAYS use fenced code blocks (three backticks) with a language identifier (e.g., `bash, `python).
+  - NEVER use indentation (4 spaces) for code blocks.
+- **Inline Code:** Use single backticks for: filenames, directories, variable names, methods, and boolean values (`true`/`false`). Do not bold these.
+- **Lists:**
+  - Use hyphens `-` for bullet points.
+  - Use `1.` for ALL numbered list items (Markdown renders the order automatically).
+- **Alerts:** Use GitHub-standard alert syntax:
+  ```markdown
+  > [!NOTE]
+  > text
+  ```
+- **Links:** Use descriptive link text. Never use "click here."
+
+## 4. Structural Template & Logic
+
+Determine if the project is a **Library** (code used by other code) or an **Application** (standalone tool).
+
+### Section 1: The Hook (Required)
+
+- **H1:** Project Name.
+- **Description:** ONE paragraph.
+  1.  What is it? (Concrete noun).
+  2.  What problem does it solve?
+  3.  Why is it distinct? (Metrics, not adjectives).
+- **Bad Description:** "A holistic solution for data."
+- **Good Description:** "A Python library that converts CSV to JSON without loading the file into memory."
+
+### Section 2: Visuals (Required)
+
+- Include a placeholder for a screenshot, GIF, or terminal output.
+- `![Description of visual content](relative/path/to/image.png)`
+
+### Section 3: Installation & Usage (Context Dependent)
+
+**IF LIBRARY (e.g., npm, pip):**
+
+1.  **Install:** `pip install package-name`
+2.  **Quick Start:** Provide a "Copy-Paste" block.
+    - MUST be a self-contained code snippet that actually runs.
+    - MUST use real API method names found in the context.
+    - DO NOT use generic placeholders like `foo` or `bar` unless necessary.
+
+**IF APPLICATION (e.g., Web App, CLI):**
+
+1.  **Prerequisites:** Strict list (e.g., "Node v18+", "Docker").
+2.  **Setup:**
+    ```bash
+    git clone [repo]
+    npm install
+    cp .env.example .env
+    npm run start
+    ```
+
+### Section 4: Deep Dive (Optional but Recommended)
+
+- **Configuration:** Env variables, flags.
+- **Architecture:** High-level diagram explanation (if complex).
+- **Roadmap:** Planned features (clearly marked as "Future").
+
+## 5. "AI-Proofing" Verification Checklist
+
+Before finalizing the output, perform these checks:
+
+1.  **Hallucination Check:** Do the installation commands actually exist in the codebase (e.g., is there a `requirements.txt` or `package.json` matching the install instructions)?
+2.  **API Check:** Do the methods used in the "Quick Start" match the actual function definitions in the provided files?
+3.  **Adverb Purge:** Remove all adverbs ending in "ly" (e.g., "automatically," "intuitively") unless essential for technical accuracy.

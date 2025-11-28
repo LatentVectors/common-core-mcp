@@ -12,10 +12,10 @@ from loguru import logger
 from pinecone import Pinecone
 from pinecone.exceptions import PineconeException
 
-from tools.config import get_settings
+from src.mcp_config import get_mcp_settings
 from tools.pinecone_models import PineconeRecord
 
-settings = get_settings()
+settings = get_mcp_settings()
 
 
 class PineconeClient:
@@ -205,10 +205,109 @@ class PineconeClient:
             "normalized_subject",
             "publication_status",
             "parent_id",  # Must be omitted when None (Pinecone doesn't accept null)
+            "document_id",
+            "document_valid",
         }
         for field in optional_fields:
             if record_dict.get(field) is None:
                 record_dict.pop(field, None)
+
+        return record_dict
+
+    def search_standards(
+        self,
+        query_text: str,
+        top_k: int = 5,
+        grade: str | None = None,
+    ) -> list[dict]:
+        """
+        Perform semantic search over standards.
+
+        Args:
+            query_text: Natural language query
+            top_k: Maximum number of results
+            grade: Optional grade filter
+
+        Returns:
+            List of result dictionaries with metadata and scores
+        """
+        # Build filter dictionary dynamically
+        # Always filter to only leaf nodes (actual standards, not parent categories)
+        filter_parts = [{"is_leaf": {"$eq": True}}]
+        
+        if grade:
+            filter_parts.append({"education_levels": {"$in": [grade]}})
+
+        filter_dict = None
+        if len(filter_parts) == 1:
+            filter_dict = filter_parts[0]
+        elif len(filter_parts) == 2:
+            filter_dict = {"$and": filter_parts}
+
+        # Build query dictionary
+        query_dict: dict[str, Any] = {
+            "inputs": {"text": query_text},
+            "top_k": top_k * 2,  # Get more candidates for reranking
+        }
+        if filter_dict:
+            query_dict["filter"] = filter_dict
+
+        # Call search with reranking
+        results = self.index.search(
+            namespace=self.namespace,
+            query=query_dict,
+            rerank={"model": "bge-reranker-v2-m3", "top_n": top_k, "rank_fields": ["content"]},
+        )
+
+        # Parse results
+        hits = results.get("result", {}).get("hits", [])
+        parsed_results = []
+        for hit in hits:
+            result_dict = {
+                "_id": hit["_id"],
+                "score": hit["_score"],
+                **hit.get("fields", {}),
+            }
+            parsed_results.append(result_dict)
+
+        return parsed_results
+
+    def fetch_standard(self, standard_id: str) -> dict | None:
+        """
+        Fetch a standard by its GUID (_id field only).
+
+        This method performs a direct lookup using Pinecone's fetch() API, which only
+        works with the standard's GUID (_id field). It does NOT search by statement_notation,
+        asn_identifier, or any other metadata fields.
+
+        Args:
+            standard_id: Standard GUID (_id field) - must be the exact GUID format
+                (e.g., "EA60C8D165F6481B90BFF782CE193F93")
+
+        Returns:
+            Standard dictionary with metadata, or None if not found
+        """
+        result = self.index.fetch(ids=[standard_id], namespace=self.namespace)
+
+        # Extract vectors from FetchResponse
+        # FetchResponse.vectors is a dict mapping ID to Vector objects
+        vectors = result.vectors
+        
+        if not vectors or standard_id not in vectors:
+            return None
+
+        vector = vectors[standard_id]
+        
+        # Extract metadata from Vector object
+        # Vector has: id, values (embedding), and metadata (dict with all fields)
+        metadata = vector.metadata or {}
+        vector_id = vector.id
+
+        # Combine _id with all metadata fields
+        record_dict = {
+            "_id": vector_id,
+            **metadata,
+        }
 
         return record_dict
 

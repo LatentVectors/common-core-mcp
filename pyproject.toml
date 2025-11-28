@@ -3,8 +3,7 @@ name = "common-core-mcp"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
-    "mcp",
-    "gradio>=5.0.0,<6.0.0",
+    "gradio[mcp]>=6.0.0",
     "pinecone",
     "python-dotenv",
     "typer",
@@ -13,6 +12,7 @@ dependencies = [
     "loguru",
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",
+    "huggingface_hub",
 ]
 
 [project.optional-dependencies]

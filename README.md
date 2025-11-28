@@ -133,12 +133,6 @@ A JSON object with:
 
 This enables exploring entire families of standards. For example, if you find a specific standard about fractions, you can look up its parent to see the broader category, or look up its children to see more specific fraction-related standards at different levels.
 
-## Screenshots
-
-![Gradio web interface](screenshots/gradio-interface.png)
-
-_Screenshots showing the Gradio interface, MCP client integration, and example results will be added here._
-
 ## Try It Out
 
 You can quickly experiment with this MCP server without any setup by using the deployed Hugging Face Space. The Space connects to a pre-existing Pinecone database with Wyoming standards already loaded, so you can start using it immediately.

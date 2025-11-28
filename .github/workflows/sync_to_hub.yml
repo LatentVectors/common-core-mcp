@@ -14,4 +14,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push --force https://lindowXYZ:$HF_TOKEN@huggingface.co/spaces/lindowXYZ/common_core_mcp main
+        run: git push --force https://lindowXYZ:$HF_TOKEN@huggingface.co/spaces/MCP-1st-Birthday/common_core_mcp main

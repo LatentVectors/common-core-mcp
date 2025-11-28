@@ -133,13 +133,19 @@ A JSON object with:
 
 This enables exploring entire families of standards. For example, if you find a specific standard about fractions, you can look up its parent to see the broader category, or look up its children to see more specific fraction-related standards at different levels.
 
+## Screenshots
+
+![Gradio web interface](screenshots/gradio-interface.png)
+
+_Screenshots showing the Gradio interface, MCP client integration, and example results will be added here._
+
 ## Try It Out
 
 You can quickly experiment with this MCP server without any setup by using the deployed Hugging Face Space. The Space connects to a pre-existing Pinecone database with Wyoming standards already loaded, so you can start using it immediately.
 
-**Hugging Face Space**: [https://lindowxyz-common-core-mcp.hf.space](https://lindowxyz-common-core-mcp.hf.space)
+**Hugging Face Space**: [https://huggingface.co/spaces/MCP-1st-Birthday/common_core_mcp](https://huggingface.co/spaces/MCP-1st-Birthday/common_core_mcp)
 
-The MCP server endpoint is available at: `https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/`
+The MCP server endpoint is available at: `https://MCP-1st-Birthday-common-core-mcp.hf.space/gradio_api/mcp/`
 
 ## Important: Database Setup
 
@@ -390,7 +396,7 @@ Connect from Claude Desktop, Cursor, or other MCP clients.
 
 **MCP Server URL**:
 
-- Hugging Face Space: `https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/`
+- Hugging Face Space: `https://MCP-1st-Birthday-common-core-mcp.hf.space/gradio_api/mcp/`
 - Local: `http://localhost:7860/gradio_api/mcp/`
 
 **Claude Desktop Configuration**:
@@ -412,7 +418,7 @@ Add:
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/",
+        "https://MCP-1st-Birthday-common-core-mcp.hf.space/gradio_api/mcp/",
         "--transport",
         "streamable-http"
       ]
@@ -441,7 +447,7 @@ node --version
       "command": "/path/to/.nvm/versions/node/v22.x.x/bin/npx",
       "args": [
         "mcp-remote",
-        "https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/",
+        "https://MCP-1st-Birthday-common-core-mcp.hf.space/gradio_api/mcp/",
         "--transport",
         "streamable-http"
       ],
@@ -471,7 +477,7 @@ Edit your Cursor MCP config and add:
 {
   "mcpServers": {
     "common-core": {
-      "url": "https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/"
+      "url": "https://MCP-1st-Birthday-common-core-mcp.hf.space/gradio_api/mcp/"
     }
   }
 }

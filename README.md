@@ -17,6 +17,12 @@ tags:
 
 A Model Context Protocol (MCP) server that provides semantic search and lookup for Common Core educational standards. Uses vector similarity search to find standards relevant to learning activities, lessons, or educational objectives. Exposes two MCP tools: `find_relevant_standards` for semantic search and `get_standard_details` for direct lookup by identifier.
 
+## See It In Action
+
+Here is a quick demo to see how the MCP server works in Claude Desktop:
+
+[![Common Core MCP Server - Watch Video](https://cdn.loom.com/sessions/thumbnails/889821a9b24f405fb2c64abd9150afff-39030d57883e99b1-full-play.gif#t=0.1)](https://www.loom.com/share/889821a9b24f405fb2c64abd9150afff)
+
 ## MCP Tools
 
 This server exposes two MCP tools that enable semantic search and detailed lookup of educational standards:
@@ -132,6 +138,14 @@ This enables exploring entire families of standards. For example, if you find a 
 ![Gradio web interface](screenshots/gradio-interface.png)
 
 _Screenshots showing the Gradio interface, MCP client integration, and example results will be added here._
+
+## Try It Out
+
+You can quickly experiment with this MCP server without any setup by using the deployed Hugging Face Space. The Space connects to a pre-existing Pinecone database with Wyoming standards already loaded, so you can start using it immediately.
+
+**Hugging Face Space**: [https://lindowxyz-common-core-mcp.hf.space](https://lindowxyz-common-core-mcp.hf.space)
+
+The MCP server endpoint is available at: `https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/`
 
 ## Important: Database Setup
 
@@ -387,6 +401,8 @@ Connect from Claude Desktop, Cursor, or other MCP clients.
 
 **Claude Desktop Configuration**:
 
+Claude Desktop requires using `npx mcp-remote` to connect to remote MCP servers. First, ensure you have Node.js v20 or later installed.
+
 Edit your Claude Desktop config file:
 
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -399,11 +415,59 @@ Add:
 {
   "mcpServers": {
     "common-core": {
-      "url": "https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/"
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/",
+        "--transport",
+        "streamable-http"
+      ]
     }
   }
 }
 ```
+
+<details>
+<summary><strong>Troubleshooting: Node.js Version Issues</strong></summary>
+
+If you see an error like `ReferenceError: File is not defined`, your Node.js version is too old. The `mcp-remote` package requires Node.js v20 or later.
+
+**Check your Node.js version:**
+
+```bash
+node --version
+```
+
+**If using nvm and have Node v20+ installed**, you can specify the full path to npx in your config:
+
+```json
+{
+  "mcpServers": {
+    "common-core": {
+      "command": "/path/to/.nvm/versions/node/v22.x.x/bin/npx",
+      "args": [
+        "mcp-remote",
+        "https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/",
+        "--transport",
+        "streamable-http"
+      ],
+      "env": {
+        "PATH": "/path/to/.nvm/versions/node/v22.x.x/bin:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  }
+}
+```
+
+Replace `/path/to/.nvm/versions/node/v22.x.x/bin` with your actual Node.js v20+ installation path (e.g., `~/.nvm/versions/node/v22.18.0/bin` on macOS/Linux).
+
+**Also clear the npx cache** to remove any cached packages from older Node versions:
+
+```bash
+rm -rf ~/.npm/_npx/
+```
+
+</details>
 
 **Cursor Configuration**:
 
@@ -421,26 +485,6 @@ Edit your Cursor MCP config and add:
 
 Restart the client after configuration. The tools `find_relevant_standards` and `get_standard_details` will appear in your client. See the [MCP Tools](#mcp-tools) section above for detailed documentation on these tools.
 
-## Hugging Face Space Deployment
-
-The deployed Hugging Face Space connects to a pre-existing Pinecone database with Wyoming standards already loaded. No additional data setup is required when using the Space.
-
-1. Create a Space in the `MCP-1st-Birthday` organization at https://huggingface.co/spaces
-2. Set SDK to `gradio` and Python version to 3.12+
-3. Upload `app.py`, `requirements.txt`, `README.md`, `.env.example`, and the `src/` directory
-4. Configure environment variables in Space settings:
-   - `PINECONE_API_KEY` - Points to the pre-existing Pinecone database
-   - `PINECONE_INDEX_NAME` - Index name with Wyoming standards
-   - `PINECONE_NAMESPACE` - Namespace containing the standards
-   - `HF_TOKEN` - Hugging Face token for chat interface
-5. The Space builds and deploys. The MCP server is available at `https://lindowxyz-common-core-mcp.hf.space/gradio_api/mcp/`
-
-> **Note**: If you're deploying your own Space with different standards, follow the [Local Setup with Pinecone](#local-setup-with-pinecone) workflow to populate your Pinecone database before deploying.
-
-## Team Information
-
-Built by [@lindowXYZ](https://huggingface.co/lindowXYZ)
-
 ## Architecture
 
 Built with:
@@ -450,39 +494,11 @@ Built with:
 - **Hugging Face Inference API**: Chat interface with tool calling (Qwen/Qwen2.5-7B-Instruct via Together AI provider)
 - **Pydantic**: Data validation and settings management
 
-### How MCP Tools Work
-
-1. Functions in `app.py` are defined with type hints and docstrings
-2. Gradio converts these functions into MCP tools when `mcp_server=True` is set
-3. Function signatures, docstrings, and type hints generate the MCP tool schema
-4. MCP clients connect via the SSE endpoint at `/gradio_api/mcp/` and call tools using the MCP protocol
-
-### MCP Server Endpoints
-
-- **Schema**: `{base_url}/gradio_api/mcp/schema` - Returns the MCP tool schema
-- **SSE**: `{base_url}/gradio_api/mcp/` - Server-Sent Events endpoint for MCP clients
-
-### Implementation Details
-
-**`find_relevant_standards`**:
-
-- Embeds the activity description using the same embedding model as the database
-- Performs vector similarity search in Pinecone
-- Filters by grade if provided
-- Returns ranked results with relevance scores
-
-**`get_standard_details`**:
-
-- Searches Pinecone by standard ID (GUID format only)
-- Retrieves complete metadata including hierarchy relationships
-- Returns structured JSON with all available fields
-- **Note**: Standard IDs must be obtained from search results using `find_relevant_standards`
-
 ## Demo Video
 
-_Link to demo video will be added here._
+[Watch the demo video](https://www.loom.com/share/889821a9b24f405fb2c64abd9150afff) to see the MCP server in action.
 
-The demo video (1-5 minutes) demonstrates:
+The demo video demonstrates:
 
 - MCP server integration with Claude Desktop or Cursor
 - Using the Gradio web interface
@@ -491,10 +507,7 @@ The demo video (1-5 minutes) demonstrates:
 
 ## Social Media
 
-_Links to social media posts will be added here._
-
-- [Twitter/X Post](your-twitter-post-url)
-- [LinkedIn Post](your-linkedin-post-url)
+- [LinkedIn Post](https://www.linkedin.com/posts/latentvectors_mcp-huggingface-ai-activity-7400243197584633856-OJFN?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFfgF_MBZDpbmlUkjgXTIFV-5zTUfybTlJU)
 
 ## Acknowledgments
 
